@@ -38,6 +38,7 @@ func dirExists(dir string) bool {
 	return !os.IsNotExist(err)
 }
 
+// Create a new file
 func CreateFile(path string) (*os.File, error) {
 
 	file, err := os.OpenFile(path, os.O_WRONLY|os.O_CREATE, 0640)
