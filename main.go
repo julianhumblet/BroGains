@@ -3,6 +3,7 @@ package main
 import (
 	"BroGains/configfile"
 	"BroGains/logfile"
+	"BroGains/webserver"
 	"fmt"
 	"log"
 	"os"
@@ -30,4 +31,8 @@ func init() {
 
 func main() {
 
+	webserverPort := configfile.Configuration.Webserver.Port
+
+	// Start the webserver
+	webserver.StartWebserver(webserverPort)
 }
