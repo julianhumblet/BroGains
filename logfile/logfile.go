@@ -19,7 +19,7 @@ func InitLogfile(pathLogfile string) (*os.File, error) {
 	}
 
 	// Create or open the logfile within the given path
-	logfile, err := os.OpenFile(pathLogfile, os.O_WRONLY|os.O_CREATE|os.O_APPEND, 0640)
+	logfile, err := CreateFile(pathLogfile)
 	if err != nil {
 		return nil, fmt.Errorf("logfile error: %s", err)
 	}
@@ -36,4 +36,14 @@ func dirExists(dir string) bool {
 	_, err := os.Stat(dir)
 
 	return !os.IsNotExist(err)
+}
+
+func CreateFile(path string) (*os.File, error) {
+
+	file, err := os.OpenFile(path, os.O_WRONLY|os.O_CREATE, 0640)
+	if err != nil {
+		return nil, fmt.Errorf("error creating file: %s", err)
+	}
+
+	return file, nil
 }
