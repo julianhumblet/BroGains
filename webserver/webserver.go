@@ -19,6 +19,7 @@ const (
 	usernameNotFound   = "Username does not exist"
 	usernameFoundOften = "Username exists more than once"
 	invalidCredentials = "Invalid credentials"
+	usernameExists     = "Username is already in use"
 )
 
 func StartWebserver(port int) {
@@ -32,6 +33,7 @@ func StartWebserver(port int) {
 
 	// Host the handlers
 	http.HandleFunc("/login", loginHandler)
+	http.HandleFunc("/register", registrationHandler)
 
 	// Start the webserver
 	err := http.ListenAndServe(":"+strconv.Itoa(port), nil)
@@ -66,7 +68,7 @@ func loginHandler(w http.ResponseWriter, r *http.Request) {
 	// Make a connection to the database
 	dbCon, err := database.OpenDBCon()
 	if err != nil {
-		log.Printf("error making db conn on login: ", err)
+		log.Printf("error making db conn on login: %s", err)
 		http.Error(w, internalError, http.StatusInternalServerError)
 		return
 	}
@@ -102,6 +104,75 @@ func loginHandler(w http.ResponseWriter, r *http.Request) {
 
 	if !hashing.CheckHashPassword(user.Password, userPasswordHash) {
 		http.Error(w, invalidCredentials, http.StatusUnauthorized)
+		return
+	}
+
+	// Send HTTP code 200, login is succesful
+	w.WriteHeader(http.StatusOK)
+}
+
+func registrationHandler(w http.ResponseWriter, r *http.Request) {
+
+	// Check if the made request is POST
+	if r.Method != http.MethodPost {
+		http.Error(w, methodNotAllowed, http.StatusMethodNotAllowed)
+		return
+	}
+
+	// Check if the given API key is valid
+	enteredApiKey := r.Header.Get("Authorization")
+	if !isAPIKeyValid(enteredApiKey) {
+		http.Error(w, unauthorized, http.StatusUnauthorized)
+		return
+	}
+
+	// Insert post data into UserRegister struct
+	var user database.UserRegistration
+	err := json.NewDecoder(r.Body).Decode(&user)
+	if err != nil {
+		http.Error(w, invalidRequestBody, http.StatusBadRequest)
+		return
+	}
+
+	// Make a connection to the database
+	dbCon, err := database.OpenDBCon()
+	if err != nil {
+		log.Printf("error making db conn on registration: %s", err)
+		http.Error(w, internalError, http.StatusInternalServerError)
+		return
+	}
+	defer dbCon.Close()
+
+	// Check if the username is already present in the database
+	queryUserCheck := "SELECT COUNT(*) FROM accounts WHERE username = ?"
+	var userCount int
+	err = dbCon.QueryRow(queryUserCheck, user.Username).Scan(&userCount)
+	if err != nil {
+		log.Printf("error checking user existence on login: %s", err)
+		http.Error(w, internalError, http.StatusInternalServerError)
+		return
+	}
+
+	// Check the count to determine if the username already exists in the database
+	if userCount > 0 {
+		http.Error(w, usernameExists, http.StatusConflict)
+		return
+	}
+
+	// Hash the password from the user
+	userPasswordHash, err := hashing.HashPassword(user.Password)
+	if err != nil {
+		log.Println(err)
+		http.Error(w, internalError, http.StatusInternalServerError)
+		return
+	}
+
+	// Add the user to the database
+	queryAddUserToDB := "INSERT INTO accounts (username, password) VALUES (?, ?)"
+	_, err = dbCon.Exec(queryAddUserToDB, user.Username, userPasswordHash)
+	if err != nil {
+		log.Printf("error inserting user into database: %s", err)
+		http.Error(w, internalError, http.StatusInternalServerError)
 		return
 	}
 
