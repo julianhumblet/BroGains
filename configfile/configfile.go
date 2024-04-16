@@ -17,6 +17,13 @@ type configuration struct {
 		Port   int    `json:"port"`
 		APIKey string `json:"apikey"`
 	} `json:"webserver"`
+	Database struct {
+		Host         string `json:"host"`
+		Port         int    `json:"port"`
+		Username     string `json:"username"`
+		Password     string `json:"Password"`
+		DatabaseName string `json:"databasename"`
+	} `json:"database"`
 }
 
 func InitConfigfile(pathConfigfile string) error {
