@@ -17,6 +17,7 @@ type configuration struct {
 		Port             int    `json:"port"`
 		APIKey           string `json:"apikey"`
 		SecretSessionKey string `json:"secretsessionkey"`
+		SessionName      string `json:"sessionname"`
 	} `json:"webserver"`
 	Database struct {
 		Host         string `json:"host"`
