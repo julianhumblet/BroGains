@@ -76,7 +76,7 @@ func fileExists(path string) bool {
 	} else if os.IsNotExist(err) {
 		return false
 	} else {
-		log.Fatalf("configfile error: %s", err)
+		log.Fatalf("error checking file existence: %s", err)
 	}
 
 	return false
