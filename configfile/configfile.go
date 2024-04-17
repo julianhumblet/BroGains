@@ -15,7 +15,6 @@ var Configuration configuration
 type configuration struct {
 	Webserver struct {
 		Port             int    `json:"port"`
-		APIKey           string `json:"apikey"`
 		SecretSessionKey string `json:"secretsessionkey"`
 		SessionName      string `json:"sessionname"`
 	} `json:"webserver"`
