@@ -9,20 +9,11 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 )
 
-type UserLogin struct {
-	Username string `json:"username"`
-	Password string `json:"password"`
-}
-
-type UserRegistration struct {
-	Username string `json:"username"`
-	Password string `json:"password"`
-}
-
 func OpenDBCon() (*sql.DB, error) {
 
 	// Database connection creds
-	dbConCreds := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s",
+	dbConCreds := fmt.Sprintf(
+		"%s:%s@tcp(%s:%s)/%s",
 		configfile.Configuration.Database.Username,
 		configfile.Configuration.Database.Password,
 		configfile.Configuration.Database.Host,
