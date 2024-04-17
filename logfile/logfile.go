@@ -21,7 +21,7 @@ func InitLogfile(pathLogfile string) (*os.File, error) {
 	// Create or open the logfile within the given path
 	logfile, err := CreateFile(pathLogfile)
 	if err != nil {
-		return nil, fmt.Errorf("logfile error: %s", err)
+		return nil, err
 	}
 
 	// Define the created logfile as standard output for logs
@@ -34,6 +34,11 @@ func InitLogfile(pathLogfile string) (*os.File, error) {
 func dirExists(dir string) bool {
 
 	_, err := os.Stat(dir)
+	if err != nil {
+		fmt.Println(
+			fmt.Errorf("error checking directory existence: %s", err),
+		)
+	}
 
 	return !os.IsNotExist(err)
 }
