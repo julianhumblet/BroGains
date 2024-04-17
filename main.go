@@ -31,6 +31,8 @@ func init() {
 
 func main() {
 
+	webserver.SetupSessions()
+
 	webserverPort := configfile.Configuration.Webserver.Port
 
 	// Start the webserver
